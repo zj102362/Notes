@@ -438,7 +438,7 @@ private static void test3() throws IOException {
 
 1. 单核 cpu 下，多线程不能实际提高程序运行效率，只是为了能够在不同的任务之间切换，不同线程轮流使用 cpu ，不至于一个线程总占用 cpu，别的线程没法干活
 2. 多核 cpu 可以并行跑多个线程，但能否提高程序运行效率还是要分情况的
-   - 有些任务，经过精心设计，将任务拆分，并行执行，当然可以提高程序的运行效率。但不是所有计算任 务都能拆分（参考后文的【阿姆达尔定律】）
+   - 有些任务，经过精心设计，将任务拆分，并行执行，当然可以提高程序的运行效率。但不是所有计算任务都能拆分（参考后文的【阿姆达尔定律】）
    - 也不是所有任务都需要拆分，任务的目的如果不同，谈拆分和效率没啥意义
 3. IO 操作不占用 cpu，只是我们一般拷贝文件使用的是【阻塞 IO】，这时相当于线程虽然不用 cpu，但需要一 直等待 IO 结束，没能充分利用线程。所以才有后面的【非阻塞 IO】和【异步 IO】优化。
 
@@ -681,8 +681,6 @@ public interface Callable<V> {
 - FutureTask实现了Runnable接口，并重写了Run方法，在Run方法中调用了Callable中的call方法，并将返回值赋值给outcome变量
 - get方法就是取出outcome的值。
 
-
-
 ## 3.2 观察多个线程同时运行 
 
 主要是理解 
@@ -736,7 +734,7 @@ public class TestMultiThread {
 - tasklist 查看进程 
   - `tasklist` | `findstr` (查找关键字)
 - taskkill 杀死进程
-  - taskkill /F(彻底杀死）/PID(进程PID)
+  - taskkill /F(彻底杀死）/PID 进程PID
 
 
 
@@ -810,10 +808,8 @@ Java Virtual Machine Stacks （Java 虚拟机栈）
 
 ## 3.5常见方法
 
-
-
 | 方法                                            | 功能                                                         | 说明                                                         |
-| ----------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| :---------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | **public void start()**                         | 启动一个新线程；Java虚拟机调用此线程的run方法                | start 方法只是让线程进入就绪，里面代码不一定立刻 运行（CPU 的时间片还没分给它）。每个线程对象的 start方法只能调用一次，如果调用了多次会出现 IllegalThreadStateException |
 | **public void run()**                           | 线程启动后调用该方法                                         | 如果在构造 Thread 对象时传递了 Runnable 参数，则 线程启动后会调用 Runnable 中的 run 方法，否则默 认不执行任何操作。但可以创建 Thread 的子类对象， 来覆盖默认行为 |
 | **public void setName(String name)**            | 给当前线程取名字                                             |                                                              |
@@ -832,9 +828,7 @@ Java Virtual Machine Stacks （Java 虚拟机栈）
 | **public final void setDaemon(boolean on)**     | 将此线程标记为守护线程或用户线程                             |                                                              |
 | **public long getId()**                         | 获取线程长整型 的 id                                         | id 唯一                                                      |
 | **public state getState()**                     | 获取线程状态                                                 | Java 中线程状态是用 6 个 enum 表示，分别为： NEW, RUNNABLE, BLOCKED, WAITING,  TIMED_WAITING, TERMINATED |
-| **public boolean isInterrupted()**              | 判断是否被打 断                                              | 不会清除 打断标记                                            |
-
-
+| **public boolean isInterrupted()**              | 判断是否被打 断                                              | 不会清除打断标记                                             |
 
 ## 3.6 start 与 run 
 
@@ -885,8 +879,6 @@ t1.start();
 ```
 
 程序在 t1 线程运行， FileReader.read() 方法调用是异步的
-
-
 
 ### 小结 
 
@@ -1036,7 +1028,7 @@ public class TestYield {
 
 
 
-###  $\textcolor{Green}{* 应用之限制（案例1） } $
+###  应用之限制
 
 #### sleep 实现 
 
@@ -1136,7 +1128,7 @@ private static void test1() throws InterruptedException {
 
 
 
-### $\textcolor{green}{* 应用之同步（案例1）}$
+### 应用之同步（案例1）
 
 以调用方角度来讲，如果
 
@@ -1326,7 +1318,7 @@ private static void test2() throws InterruptedException {
 
 
 
-### <font color="orange">\* 模式之两阶段终止</font>
+### 模式之两阶段终止
 
 Two Phase Termination 在一个线程 T1 中如何“优雅”终止线程 T2？这里的【优雅】指的是给 T2 一个料理后事的机会。
 
@@ -1341,7 +1333,7 @@ Two Phase Termination 在一个线程 T1 中如何“优雅”终止线程 T2？
 
 #### 两阶段终止模式
 
-![image-20220317193331864](img\image-20220317193331864.png)
+ ![image-20220317193331864](img\image-20220317193331864.png)
 
 ##### 利用 isInterrupted
 
@@ -1592,22 +1584,39 @@ log.debug("运行结束...");
 ![image-20220224175139037](img\image-20220224175139037.png)
 
 - NEW 线程刚被创建，但是还没有调用 start() 方法 
+
 - RUNNABLE 当调用了 start() 方法之后，注意，Java API 层面的 RUNNABLE 状态涵盖了 操作系统 层面的 【可运行状态】、【运行状态】和【阻塞状态】（由于 BIO 导致的线程阻塞，在 Java 里无法区分，仍然认为 是可运行） 
-- BLOCKED ， WAITING ， TIMED_WAITING 都是 Java API 层面对【阻塞状态】的细分，后面会在状态转换一节 详述 
-- TERMINATED 当线程代码运行结束
+
+- BLOCKED ， WAITING ， TIMED_WAITING 都是 Java API 层面对【阻塞状态】的细分，后面会在状态转换一节详述 
+
+  TERMINATED 当线程代码运行结束
 
 
 
 ## 3.14 习题
 
-阅读华罗庚《统筹方法》，给出烧水泡茶的多线程解决方案，提示 
+阅读华罗庚《统筹方法》：
+
+```java
+比如，想泡壶茶喝。当时的情况是：开水没有；水壶要洗，茶壶，茶杯要洗；火已生了，茶叶也有了。怎么办？
+
+办法甲：洗好水壶，灌上凉水，放在火上；在等待水开的时间里，洗茶壶、洗茶杯、拿茶叶；等水开了，泡茶喝。
+
+办法乙：先做好一些准备工作，洗水壶，洗茶壶茶杯，拿茶叶；一切就绪，灌水烧水；坐待水开了泡茶喝。
+
+办法丙：洗净水壶，灌上凉水，放在火上，坐待水开；水开了之后，急急忙忙找茶叶，洗茶壶茶杯，泡茶喝。
+
+哪一种办法省时间？我们能一眼看出第一种办法好，后两种办法都窝了工。
+```
+
+给出烧水泡茶的多线程解决方案，提示 
 
 - 参考图二，用两个线程（两个人协作）模拟烧水泡茶过程 
   - 文中办法乙、丙都相当于任务串行 
   - 而图一相当于启动了 4 个线程，有点浪费 
 - 用 sleep(n) 模拟洗茶壶、洗水壶等耗费的时间
 
-### $\textcolor{green}{* 应用之统筹（烧水泡茶）}$
+### 应用之统筹（烧水泡茶）
 
 #### 解法1：join
 
@@ -1803,7 +1812,7 @@ class S3 {
 
 
 
-# 4.共享模型之管程
+# 4.共享模型之管程（monitor）
 
 ## 4.1共享带来的问题
 
@@ -1906,7 +1915,7 @@ static void decrement()
 
 ## 4.2 synchronized 解决方案
 
-##### **$\textcolor{green}{*应用之互斥}$**
+##### 应用之互斥
 
 为了避免临界区的竞态条件发生，有多种手段可以达到目的。 
 
@@ -1965,11 +1974,11 @@ public static void main(String[] args) throws InterruptedException {
 
 图示流程
 
-![image-20220303001048763](img\image-20220303001048763.png)
+<img src="img\image-20220303001048763.png" alt="image-20220303001048763" style="zoom:80%;" />
 
 **思考** 
 
-synchronized 实际是用对象锁保证了临界区内代码的原子性，临界区内的代码对外是不可分割的，不会被线程切 换所打断。 
+synchronized 实际是用对象锁保证了临界区内代码的原子性，临界区内的代码对外是不可分割的，不会被线程切换所打断。 
 
 为了加深理解，请思考下面的问题
 
@@ -2335,7 +2344,7 @@ public static void main(String[] args) {
 }
 ```
 
-其中一种情况是，如果线程2 还未 add，线程1 remove 就会报错：
+结果
 
 ```java
 Exception in thread "Thread1" java.lang.IndexOutOfBoundsException: Index: 0, Size: 0 
@@ -2348,6 +2357,18 @@ Exception in thread "Thread1" java.lang.IndexOutOfBoundsException: Index: 0, Siz
 ```
 
 分析： 
+
+```java
+new Thread(() -> {
+list.add("1"); // 时间1. 会让内部 size ++
+list.remove(0); // 时间3. 再次 remove size-- 出现角标越界
+}, "t1").start();
+
+new Thread(() -> {
+list.add("2"); // 时间1（并发发生）. 会让内部 size ++，但由于size的操作非原子性, size 本该是2，但结果可能出现1
+list.remove(0); // 时间2. 第一次 remove 能成功, 这时 size 已经是0
+}, "t2").start();
+```
 
 - 无论哪个线程中的 method2 引用的都是同一个对象中的 list 成员变量 
 - method3 与 method2 分析相同
@@ -2543,7 +2564,9 @@ public class UserServiceImpl implements UserService {
 }
 ```
 
-
+> Servlet只有一份，多个线程操作同一个Servlet，UserServiceImpl会导致线程安全问题
+>
+> [描述Servlet生命周期，Servlet是线程安全的吗？ 为什么？_servlet 只有一份?-CSDN博客](https://blog.csdn.net/m0_56065322/article/details/127025908)
 
 例3：
 
@@ -2567,13 +2590,13 @@ public class MyAspect {
 }
 ```
 
-
+Spring中的对象无额外说明都是单例的，会引发线程安全问题，使用环绕通知做成局部变量可以避免此问题
 
 例4:
 
 ```java
 public class MyServlet extends HttpServlet {
-    // 是否安全
+    // 是否安全：安全，无可更改成员变量
     private UserService userService = new UserServiceImpl();
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
@@ -2581,7 +2604,7 @@ public class MyServlet extends HttpServlet {
     }
 }
 public class UserServiceImpl implements UserService {
-    // 是否安全
+    // 是否安全：安全，无可更改成员变量
     private UserDao userDao = new UserDaoImpl();
 
     public void update() {
@@ -2591,7 +2614,7 @@ public class UserServiceImpl implements UserService {
 public class UserDaoImpl implements UserDao {
     public void update() {
         String sql = "update user set password = ? where username = ?";
-        // 是否安全
+        // 是否安全：安全，无成员变量
         try (Connection conn = DriverManager.getConnection("","","")){
             // ...
         } catch (Exception e) {
@@ -2607,7 +2630,7 @@ public class UserDaoImpl implements UserDao {
 
 ```java
 public class MyServlet extends HttpServlet {
-    // 是否安全
+    // 是否安全：不安全
     private UserService userService = new UserServiceImpl();
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
@@ -2615,7 +2638,7 @@ public class MyServlet extends HttpServlet {
     }
 }
 public class UserServiceImpl implements UserService {
-    // 是否安全
+    // 是否安全：不安全
     private UserDao userDao = new UserDaoImpl();
 
     public void update() {
@@ -2623,12 +2646,12 @@ public class UserServiceImpl implements UserService {
     }
 }
 public class UserDaoImpl implements UserDao {
-    // 是否安全
+    // 是否安全：危险，有局部变量，非安全
     private Connection conn = null;
     public void update() throws SQLException {
         String sql = "update user set password = ? where username = ?";
         conn = DriverManager.getConnection("","","");
-        // ...
+        // ... 
         conn.close();
     }
 }
@@ -2640,7 +2663,7 @@ public class UserDaoImpl implements UserDao {
 
 ```java
 public class MyServlet extends HttpServlet {
-    // 是否安全
+    // 是否安全：安全
     private UserService userService = new UserServiceImpl();
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
@@ -2648,13 +2671,14 @@ public class MyServlet extends HttpServlet {
     }
 }
 public class UserServiceImpl implements UserService {
+    // 是否安全：安全，每次创建了一个新的DAO
     public void update() {
         UserDao userDao = new UserDaoImpl();
         userDao.update();
     }
 }
 public class UserDaoImpl implements UserDao {
-    // 是否安全
+    // 是否安全，资源最好用作局部变量而不是成员变量，容易导致线程安全问题
     private Connection = null;
     public void update() throws SQLException {
         String sql = "update user set password = ? where username = ?";
@@ -2704,7 +2728,7 @@ public void foo(SimpleDateFormat sdf) {
 }
 ```
 
-请比较 JDK 中 String 类的实现
+请比较 JDK 中 String 类的实现（final修饰保证安全）
 
 例8：
 
@@ -2749,8 +2773,9 @@ public static void main(String[] args) throws InterruptedException {
 public class ExerciseSell {
     public static void main(String[] args) {
         TicketWindow ticketWindow = new TicketWindow(2000);
+        //存储所有子线程方便join
         List<Thread> list = new ArrayList<>();
-        // 用来存储买出去多少张票
+        // 用来存储卖出去多少张票，需要保证线程安全
         List<Integer> sellCount = new Vector<>();
         for (int i = 0; i < 2000; i++) {
             Thread t = new Thread(() -> {
@@ -2768,7 +2793,7 @@ public class ExerciseSell {
                 e.printStackTrace();
             }
         });
-        // 买出去的票求和
+        // 卖出去的票求和
         log.debug("selled count:{}",sellCount.stream().mapToInt(c -> c).sum());
         // 剩余票数
         log.debug("remainder count:{}", ticketWindow.getCount());
@@ -2888,7 +2913,18 @@ public synchronized void transfer(Account target, int amount) {
 }
 ```
 
+锁住类
 
+```java
+public void transferMoney(Account target, int amount){
+    synchronized (Account.class){
+        if(this.money >= amount){
+            this.setMoney(this.getMoney()-amount);
+            target.setMoney(target.getMoney()+amount);
+        }
+    }
+}
+```
 
 ## 4.6 Monitor 概念
 
@@ -2958,7 +2994,7 @@ public synchronized void transfer(Account target, int amount) {
 
 
 
-### <font color='blue'>* 原理之Monitor(锁)</font>
+### 原理之Monitor(锁)
 
 Monitor 被翻译为**监视器**或**管程** 
 
@@ -2968,7 +3004,7 @@ Monitor 结构如下
 
 ![image-20220317181913745](img\image-20220317181913745.png)
 
-
+![image-20250420165906670](JUC.assets/image-20250420165906670.png)
 
 - 刚开始 Monitor 中 Owner 为 null 
 - 当 Thread-2 执行 synchronized(obj) 就会将 Monitor 的所有者 Owner 置为 Thread-2，Monitor中只能有一 个 Owner 
@@ -2983,7 +3019,7 @@ Monitor 结构如下
 
 
 
-### <font color='blue'>* 原理之 synchronized</font>
+### 原理之 synchronized
 
 ```java
 static final Object lock = new Object();
@@ -3047,7 +3083,7 @@ descriptor: ([Ljava/lang/String;)V
 
 
 
-### <font color='blue'>* 原理之 synchronized 进阶</font>
+### 原理之 synchronized 进阶
 
 #### 轻量级锁
 
@@ -3084,9 +3120,9 @@ public static void method2() {
 
   ![image-20220317183112363](img\image-20220317183112363.png)
 
-- 如果 cas 失败，有两种情况 
+- 如果 cas 失败，有两种情况 （如果其他线程发现对象头已经是轻量级锁状态（`00`），会**直接判定CAS失败**，而不会真正执行CAS指令）
 
-  - 如果是其它线程已经持有了该 Object 的轻量级锁，这时表明有竞争，进入锁膨胀过程 
+  - 如果是其它线程已经持有了该 Object 的轻量级锁，这时表明有竞争，进入**锁膨胀**过程 
   - 如果是自己执行了 synchronized 锁重入，那么再添加一条 Lock Record 作为重入的计数
 
   ![image-20220317183158959](img\image-20220317183158959.png)
@@ -3104,7 +3140,7 @@ public static void method2() {
 
 #### 锁膨胀
 
-如果在尝试加轻量级锁的过程中，CAS 操作无法成功，这时一种情况就是有其它线程为此对象加上了轻量级锁（有 竞争），这时需要进行锁膨胀，将轻量级锁变为重量级锁。
+如果在尝试加轻量级锁的过程中，CAS 操作无法成功，这时一种情况就是有其它线程为此对象加上了轻量级锁（有竞争），这时需要进行锁膨胀，将轻量级锁变为重量级锁。
 
 ```java
 static Object obj = new Object();
@@ -3174,7 +3210,7 @@ public static void method1() {
 
 轻量级锁在没有竞争时（就自己这个线程），每次重入仍然需要执行 CAS 操作。 
 
-Java 6 中引入了偏向锁来做进一步优化：只有第一次使用 CAS 将线程 ID 设置到对象的 Mark Word 头，之后发现 这个线程 ID 是自己的就表示没有竞争，不用重新 CAS。以后只要不发生竞争，这个对象就归该线程所有 
+Java 6 中引入了偏向锁来做进一步优化：只有第一次使用 CAS 将线程 ID 设置到对象的 Mark Word 头，之后发现 这个线程 ID是自己的就表示没有竞争，不用重新 CAS。以后只要不发生竞争，这个对象就归该线程所有 
 
 例如：
 
@@ -3248,7 +3284,7 @@ end
 一个对象创建时： 
 
 - 如果开启了偏向锁（默认开启），那么对象创建后，markword 值为 0x05 即最后 3 位为 101，这时它的 thread、epoch、age 都为 0 
-- 偏向锁是默认是延迟的，不会在程序启动时立即生效，如果想避免延迟，可以加 VM 参数`- XX:BiasedLockingStartupDelay=0`来禁用延迟 
+- 偏向锁是默认是延迟的，不会在程序启动时立即生效，如果想避免延迟，可以加 VM 参数`-XX:BiasedLockingStartupDelay=0`来禁用延迟 
 - 如果没有开启偏向锁，那么对象创建后，markword 值为 0x01 即最后 3 位为 001，这时它的 hashcode、 age 都为 0，第一次用到 hashcode 时才会赋值
 
 1） 测试延迟特性 
@@ -3302,14 +3338,39 @@ public static void main(String[] args) throws IOException {
 11:13:10.018 c.TestBiased [t1] - synchronized 前
 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000001 
 11:13:10.021 c.TestBiased [t1] - synchronized 中
-00000000 00000000 00000000 00000000 00100000 00010100 11110011 10001000 
+00000000 00000000 00000000 00000000 00100000 00010100 11110011 10001000 （轻量级锁）
 11:13:10.021 c.TestBiased [t1] - synchronized 后
 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000001 
 ```
 
+加锁顺序：偏向锁 -》 轻量级锁 -》 重量级锁
+
+
+
 4)测试 hashCode 
 
 - 正常状态对象一开始是没有 hashCode 的，第一次调用才生成
+
+```java
+public class App {
+    public static void main(String[] args) throws Exception {
+        Dog dog = new Dog();
+        dog.hashCode();
+        //会诡异的撤销掉偏向锁
+        // 因为对象头是偏向锁格式时放不下整个hashcode了
+        //且这时候加锁就直接是轻量级锁
+
+        System.out.println(ClassLayout.parseInstance(dog).toPrintable());
+
+        synchronized (dog){
+            System.out.println(ClassLayout.parseInstance(dog).toPrintable());
+        }
+
+        System.out.println(ClassLayout.parseInstance(dog).toPrintable());
+    }
+}
+class Dog{}
+```
 
 
 
@@ -3435,7 +3496,7 @@ public static void main(String[] args) throws InterruptedException {
 
 如果对象虽然被多个线程访问，但没有竞争，这时偏向了线程 T1 的对象仍有机会重新偏向 T2，重偏向会重置对象 的 Thread ID 
 
-当撤销偏向锁阈值超过 20 次后，jvm 会这样觉得，我是不是偏向错了呢，于是会在给这些对象加锁时重新偏向至 加锁线程
+当撤销偏向锁阈值超过 20 次后，jvm 会这样觉得，我是不是偏向错了呢，于是会在给这些对象加锁时重新偏向至加锁线程
 
 ```java
 private static void test3() throws InterruptedException {
@@ -3567,10 +3628,10 @@ private static void test3() throws InterruptedException {
 [t2] - 18 00000000 00000000 00000000 00000000 00011111 11110011 11100000 00000101 
 [t2] - 18 00000000 00000000 00000000 00000000 00100000 01011000 11110111 00000000 
 [t2] - 18 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000001 
-[t2] - 19 00000000 00000000 00000000 00000000 00011111 11110011 11100000 00000101 
+[t2] - 19 00000000 00000000 00000000 00000000 00011111 11110011 11100000 00000101（又是偏向状态了） 
 [t2] - 19 00000000 00000000 00000000 00000000 00011111 11110011 11110001 00000101 
 [t2] - 19 00000000 00000000 00000000 00000000 00011111 11110011 11110001 00000101 
-[t2] - 20 00000000 00000000 00000000 00000000 00011111 11110011 11100000 00000101 
+[t2] - 20 00000000 00000000 00000000 00000000 00011111 11110011 11100000 00000101
 [t2] - 20 00000000 00000000 00000000 00000000 00011111 11110011 11110001 00000101 
 [t2] - 20 00000000 00000000 00000000 00000000 00011111 11110011 11110001 00000101 
 [t2] - 21 00000000 00000000 00000000 00000000 00011111 11110011 11100000 00000101 
@@ -3629,7 +3690,7 @@ private static void test4() throws InterruptedException {
             Dog d = list.get(i);
             log.debug(i + "\t" + ClassLayout.parseInstance(d).toPrintableSimple(true));
             synchronized (d) {
-                log.debug(i + "\t" + ClassLayout.parseInstance(d).toPrintableSimple(true));
+                log.debug(i + "\t" + ClassLayout.parseInstance(d).toPrintableSimple(true));（前二十次要撤销）
             }
             log.debug(i + "\t" + ClassLayout.parseInstance(d).toPrintableSimple(true));
         }
@@ -3643,14 +3704,14 @@ private static void test4() throws InterruptedException {
             Dog d = list.get(i);
             log.debug(i + "\t" + ClassLayout.parseInstance(d).toPrintableSimple(true));
             synchronized (d) {
-                log.debug(i + "\t" + ClassLayout.parseInstance(d).toPrintableSimple(true));
+                log.debug(i + "\t" + ClassLayout.parseInstance(d).toPrintableSimple(true));（从t2到t3的后20次又要撤销，又有二十次（前二十次已经是normal了））
             }
             log.debug(i + "\t" + ClassLayout.parseInstance(d).toPrintableSimple(true));
         }
     }, "t3");
     t3.start();
     t3.join();
-    log.debug(ClassLayout.parseInstance(new Dog()).toPrintableSimple(true));
+    log.debug(ClassLayout.parseInstance(new Dog()).toPrintableSimple(true));//四十次以后 新建的对象也是不可偏向的，mark class 直接就是001
 }
 ```
 
@@ -3668,7 +3729,7 @@ private static void test4() throws InterruptedException {
 
 ##### 锁消除
 
-锁消除
+锁消除（锁消除（Lock Elimination）是JVM在即时编译（JIT）时进行的一种优化技术。当JVM检测到某个锁对象仅被当前线程访问，且锁的同步块不会逃逸出当前方法时（即不存在多线程竞争的可能性），JVM会安全地移除该锁的同步操作，从而避免不必要的加锁/解锁开销。这种优化特别适用于方法内部创建的局部锁对象，如示例中`synchronized (new Object())`的场景。）
 
 ```java
 @Fork(1)
@@ -3708,9 +3769,9 @@ c.i.MyBenchmark.a 	avgt 		5 				1.507 		0.108 			ns/op
 c.i.MyBenchmark.b 	avgt 		5 				16.976 		1.572 			ns/op
 ```
 
-锁粗化 
+##### 锁粗化 
 
-对相同对象多次加锁，导致线程发生多次重入，可以使用锁粗化方式来优化，这不同于之前讲的细分锁的粒度。
+锁粗化是JVM在**即时编译（JIT）优化阶段**对同步代码块进行的一种优化策略。它的核心思想是：如果JVM检测到对同一个锁对象进行了多次连续的加锁和解锁操作，而这些操作之间没有其他需要非同步执行的代码，那么JVM会将这些零碎的同步块合并成一个更大的同步块，以减少锁的获取和释放次数，从而提高性能。
 
 
 
@@ -3718,12 +3779,12 @@ c.i.MyBenchmark.b 	avgt 		5 				16.976 		1.572 			ns/op
 
 
 
-#### <font color='blue'>* 原理之 wait / notify</font>
+#### 原理之 wait / notify
 
 ![image-20220317191950175](img\image-20220317191950175.png)
 
-- Owner 线程发现条件不满足，调用 wait 方法，即可进入 WaitSet 变为 WAITING 状态 
-- BLOCKED 和 WAITING 的线程都处于阻塞状态，不占用 CPU 时间片 
+- Owner 线程发现自己的执行条件不满足，调用 wait 方法，即可进入 WaitSet 变为 WAITING 状态 
+- BLOCKED（等待锁） 和 WAITING（等待资源） 的线程都处于阻塞状态，不占用 CPU 时间片 
 - BLOCKED 线程会在 Owner 线程释放锁时唤醒 
 - WAITING 线程会在 Owner 线程调用 notify 或 notifyAll 时唤醒，但唤醒后并不意味者立刻获得锁，仍需进入 EntryList 重新竞争
 
@@ -3801,7 +3862,7 @@ notifyAll 的结果
 
 ## 4.8 wait notify 的正确姿势
 
-开始之前先看看 
+开始之前先看看
 
 #### `sleep(long n)` 和 `wait(long n)` 的区别
 
@@ -3913,7 +3974,7 @@ new Thread(() -> {
 ```
 
 - 解决了其它干活的线程阻塞的问题 
-- 但如果有其它线程也在等待条件呢？
+- 但如果有其它线程也在等待条件呢？会不会错误唤醒其他线程
 
 
 
@@ -4073,7 +4134,7 @@ synchronized(lock) {
 
 
 
-#### $\textcolor{orange}{*模式之保护性暂停}$
+#### 模式之保护性暂停
 
 ##### **1.定义** 
 
@@ -4098,7 +4159,7 @@ class GuardedObject {
     private final Object lock = new Object();
     public Object get() {
         synchronized (lock) {
-// 条件不满足则等待
+			// 条件不满足则等待
             while (response == null) {
                 try {
                     lock.wait();
@@ -4111,7 +4172,7 @@ class GuardedObject {
     }
     public void complete(Object response) {
         synchronized (lock) {
-// 条件满足，通知等待线程
+			// 条件满足，通知等待线程
             this.response = response;
             lock.notifyAll();
         }
@@ -4260,23 +4321,12 @@ List<String> lines = v2.get(1500);
 
 
 
-##### $\textcolor{blue}{* 原理之 join}$
+##### 原理之 join
 
 是调用者轮询检查线程 alive 状态
 
-```java
+``` 
 t1.join();
-```
-
-等价于下面的代码
-
-```java
-synchronized (t1) {
-    // 调用者线程进入 t1 的 waitSet 等待, 直到 t1 运行结束
-    while (t1.isAlive()) {
-        t1.wait(0);
-    }
-}
 ```
 
 > **注意** 
@@ -4343,7 +4393,7 @@ class GuardedObject {
     // 结果
     private Object response;
     // 获取结果
-    // timeout 表示要等待多久 2000
+    // timeout 表示要等待多久 2000 
     public Object get(long timeout) {
         synchronized (this) {
             // 开始时间 15:00:00
@@ -4470,7 +4520,7 @@ public static void main(String[] args) throws InterruptedException {
 
 
 
-#### $\textcolor{orange}{* 模式之生产者消费者}$
+#### 模式之生产者消费者
 
 ##### 1.定义 
 
@@ -4546,7 +4596,7 @@ class MessageQueue {
 MessageQueue messageQueue = new MessageQueue(2);
 // 4 个生产者线程, 下载任务
 for (int i = 0; i < 4; i++) {
-    int id = i;
+    int id = i;//lamda表达式不能直接使用外面的i，需要转换一下
     new Thread(() -> {
         try {
             log.debug("download...");
@@ -4669,7 +4719,7 @@ LockSupport.unpark(t1);
 
 
 
-##### $\textcolor{blue}{* 原理之park和unpark}$
+##### 原理之park和unpark
 
 每个线程都有自己的一个 Parker 对象(由C++编写，java中不可见)，由三部分组成 `_counter `， `_cond `和 `_mutex` 打个比喻 
 
@@ -4727,6 +4777,7 @@ LockSupport.unpark(t1);
   - 竞争锁失败，**t 线程**从 `WAITING --> BLOCKED`
 
 ```java
+@Slf4j
 public class TestWaitNotify {
     final static Object obj = new Object();
     public static void main(String[] args) {
@@ -5026,7 +5077,84 @@ Found 1 deadlock.
 ```
 
 - 避免死锁要注意加锁顺序 
+
 - 另外如果由于某个线程进入了死循环，导致其它线程一直等待，对于这种情况 linux 下可以通过 top 先定位到 CPU 占用高的 Java 进程，再利用 top -Hp 进程id 来定位是哪个线程，最后再用 jstack 排查
+
+  
+
+##### 哲学家就餐
+
+```java
+package com.example;
+
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * 功能：
+ * 作者：张杰
+ * 日期：2025/4/25 16:03
+ */
+public class Test6 {
+    public static void main(String[] args) {
+        ChopStick c1 = new ChopStick("1");
+        ChopStick c2 = new ChopStick("2");
+        ChopStick c3 = new ChopStick("3");
+        ChopStick c4 = new ChopStick("4");
+        ChopStick c5 = new ChopStick("5");
+
+        Philosopher s1 = new Philosopher("s1", c1, c2);
+        Philosopher s2 = new Philosopher("s2", c2, c3);
+        Philosopher s3 = new Philosopher("s3", c3, c4);
+        Philosopher s4 = new Philosopher("s4", c4, c5);
+        Philosopher s5 = new Philosopher("s5", c5, c1);
+
+        s1.start();
+        s2.start();
+        s3.start();
+        s4.start();
+        s5.start();
+    }
+}
+
+@Slf4j
+class ChopStick{
+    private String name;
+
+    public ChopStick(String name) {
+        this.name = name;
+    }
+}
+
+class Philosopher extends Thread{
+    private static final Logger log = LoggerFactory.getLogger(Philosopher.class);
+    private ChopStick left;
+    private ChopStick right;
+
+    public Philosopher(String name, ChopStick left, ChopStick right) {
+        super(name);
+        this.left = left;
+        this.right = right;
+    }
+
+    @Override
+    public void run() {
+        while (true){
+            synchronized (left){
+                synchronized (right){
+                    log.info("{}吃东西...", this.getName());
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        }
+    }
+}
+```
 
 
 
@@ -5081,13 +5209,21 @@ public class TestLiveLock {
 说明：
 
 - 顺序加锁可以解决死锁问题，但也会导致一些线程一直得不到锁，产生饥饿现象。
+
+- ```java
+  Philosopher s1 = new Philosopher("s1", c1, c2);
+  Philosopher s2 = new Philosopher("s2", c2, c3);
+  Philosopher s3 = new Philosopher("s3", c3, c4);
+  Philosopher s4 = new Philosopher("s4", c4, c5);
+  Philosopher s5 = new Philosopher("s5", c1, c5);//反向拿筷子
+
 - 解决方式：ReentrantLock
 
 
 
 ## 4.13 ReentrantLock 
 
-相对于 synchronized 它具备如下特点 
+相对于 synchronized 它具备如下特点
 
 - 可中断 
 - 可以设置超时时间 
@@ -5298,8 +5434,9 @@ Thread t1 = new Thread(() -> {
             log.debug("获取等待 1s 后失败，返回");
             return;
         }
-    } catch (InterruptedException e) {
+    } catch (InterruptedException e) {//可以打断
         e.printStackTrace();
+        return;
     }
     try {
         log.debug("获得了锁");
@@ -5646,7 +5783,7 @@ private static void sendBreakfast() {
 
 
 
-#### <font color='orange'>\* 同步模式之顺序控制</font>
+#### 同步模式之顺序控制
 
 ##### 固定运行顺序 
 
@@ -5833,63 +5970,69 @@ as.start(aWaitSet);
 **Park Unpark 版**
 
 ```java
-class SyncPark {
-    private int loopNumber;
-    private Thread[] threads;
-    public SyncPark(int loopNumber) {
-        this.loopNumber = loopNumber;
-    }
-    public void setThreads(Thread... threads) {
-        this.threads = threads;
-    }
-    public void print(String str) {
-        for (int i = 0; i < loopNumber; i++) {
-            LockSupport.park();
-            System.out.print(str);
-            LockSupport.unpark(nextThread());
-        }
-    }
-    private Thread nextThread() {
-        Thread current = Thread.currentThread();
-        int index = 0;
-        for (int i = 0; i < threads.length; i++) {
-            if(threads[i] == current) {
-                index = i;
-                break;
-            }
-        }
-        if(index < threads.length - 1) {
-            return threads[index+1];
-        } else {
-            return threads[0];
-        }
-    }
-    public void start() {
-        for (Thread thread : threads) {
-            thread.start();
-        }
-        LockSupport.unpark(threads[0]);
+package com.example;
+
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.LockSupport;
+
+/**
+ * 功能：
+ * 作者：张杰
+ * 日期：2025/4/26 22:53
+ */
+public class Test17 {
+    static Thread t1= null;
+    static Thread t2 = null;
+    static Thread t3= null;
+
+    public static void main(String[] args) {
+        SyncPark park = new SyncPark(5);
+
+        t1 = new Thread(() -> {
+            park.print("a",t2);
+        });
+
+        t2 = new Thread(() -> {
+            park.print("b",t3);
+        });
+
+        t3 = new Thread(() -> {
+            park.print("c",t1);
+        });
+
+        t1.start();
+        t2.start();
+        t3.start();
+
+        LockSupport.unpark(t1);
     }
 }
-SyncPark syncPark = new SyncPark(5);
-Thread t1 = new Thread(() -> {
-    syncPark.print("a");
-});
-Thread t2 = new Thread(() -> {
-    syncPark.print("b");
-});
-Thread t3 = new Thread(() -> {
-    syncPark.print("c\n");
-});
-syncPark.setThreads(t1, t2, t3);
-syncPark.start();
+
+@Slf4j
+class SyncPark{
+    private int loop;
+
+    public SyncPark(int loop) {
+        this.loop = loop;
+    }
+
+    public void print(String str,Thread next){
+        for(int i=0;i<loop;i++){
+            LockSupport.park();
+            log.info("{}",str);
+            LockSupport.unpark(next);
+        }
+    }
+}
 ```
 
 
 
 ## 本章小结
 
-本章我们需要重点掌握的是 
+本章我们需要重点掌握的是
 
 - 分析多线程访问共享资源时，哪些代码片段属于临界区
 - 使用 synchronized 互斥解决临界区的线程安全问题 
@@ -5988,7 +6131,7 @@ volatile（易变关键字）
 
 #### 可见性 vs 原子性 
 
-前面例子体现的实际就是可见性，它保证的是在多个线程之间，一个线程对 volatile 变量的修改对另一个线程可 见， 不能保证原子性，仅用在一个写线程，多个读线程的情况： 上例从字节码理解是这样的：
+前面例子体现的实际就是可见性，它保证的是在多个线程之间，一个线程对 volatile 变量的修改对另一个线程可见， 不能保证原子性，仅用在一个写线程，多个读线程的情况： 上例从字节码理解是这样的：
 
 ```sh
 getstatic run // 线程 t 获取 run true 
@@ -6033,7 +6176,7 @@ putstatic i // 线程2-将修改后的值存入静态变量i 静态变量i=-1
 
 
 
-#### <font color='orange'>\* 模式之两阶段终止</font>
+#### 模式之两阶段终止
 
 
 
@@ -6165,7 +6308,7 @@ t.stop();
 
 
 
-#### <font color='orange'>\* 模式之 Balking</font>
+#### 模式之 Balking
 
 
 
@@ -6182,7 +6325,7 @@ Balking （犹豫）模式用在一个线程发现另一个线程或本线程已
 ```java
 public class MonitorService {
     // 用来表示是否已经有线程已经在执行启动了
-    private volatile boolean starting;
+    private volatile boolean starting;//依旧设置为volatile的原因是停止的时候应该置为false，否则下次启动不起来了
     public void start() {
         log.info("尝试启动监控线程...");
         synchronized (this) {
@@ -6265,7 +6408,7 @@ i = ...;
 
 
 
-#### <font color='blue'>\* 原理之指令级并行</font>
+####  原理之指令级并行
 
 
 
@@ -6510,7 +6653,7 @@ public class ConcurrencyTest {
 
 
 
-#### <font color='blue'>\* 原理之 volatile</font>
+#### 原理之 volatile
 
 volatile 的底层实现原理是内存屏障，Memory Barrier（Memory Fence） 
 
@@ -6669,7 +6812,7 @@ public final class Singleton {
     public static Singleton getInstance() {
         // 实例没创建，才会进入内部的 synchronized代码块
         if (INSTANCE == null) { 
-            synchronized (Singleton.class) { // t2
+            synchronized (Singleton.class) { // t2 
                 // 也许有其它线程已经创建实例，所以再判断一次
                 if (INSTANCE == null) { // t1
                     INSTANCE = new Singleton();
@@ -6974,11 +7117,11 @@ public final class Singleton {
 ```java
 public final class Singleton {
     private Singleton() { }
-    // 问题1：属于懒汉式还是饿汉式
+    // 问题1：属于懒汉式还是饿汉式（懒汉式，内部类第一次用到才会进行类加载）
     private static class LazyHolder {
         static final Singleton INSTANCE = new Singleton();
     }
-    // 问题2：在创建时是否有并发问题
+    // 问题2：在创建时是否有并发问题（安全，类加载由JVM保证线程安全）
     public static Singleton getInstance() {
         return LazyHolder.INSTANCE;
     }
@@ -6994,7 +7137,7 @@ public final class Singleton {
 - 可见性 - 由 JVM 缓存优化引起 
 - 有序性 - 由 JVM 指令重排序优化引起 
 - happens-before 规则 
-- <font color='blue'>原理方面</font>
+- 原理方面
   - CPU 指令并行 
   - volatile 
 - <font color='orange'>模式方面 </font>
@@ -7314,7 +7457,7 @@ public class SlowMotion {
 >
 > volatile 仅仅保证了共享变量的可见性，让其它线程能够看到最新值，但不能解决指令交错问题（不能保证原 子性）
 
-CAS 必须借助 volatile 才能读取到共享变量的最新值来实现【比较并交换】的效果。
+CAS **必须借助 volatile** 才能读取到共享变量的最新值来实现【比较并交换】的效果。
 
 
 
@@ -7890,11 +8033,11 @@ for (int i = 0; i < 5; i++) {
 1000000 cost:22 
 ```
 
-性能提升的原因很简单，就是在有竞争时，设置多个累加单元，Therad-0 累加 Cell[0]，而 Thread-1 累加 Cell[1]... 最后将结果汇总。这样它们在累加时操作的不同的 Cell 变量，因此减少了 CAS 重试失败，从而提高性 能。
+LongAdder性能提升的原因很简单，就是在有竞争时，设置多个累加单元，Therad-0 累加 Cell[0]，而 Thread-1 累加 Cell[1]... 最后将结果汇总。这样它们在累加时操作的不同的 Cell 变量，因此减少了 CAS 重试失败，从而提高性 能。
 
 
 
-#### <font color='blue'>* 原理之伪共享(CPU 缓存结构)</font>
+#### 原理之伪共享(CPU 缓存结构)
 
 ##### **CPU 缓存结构**
 
@@ -8002,7 +8145,7 @@ Memory Barrier（Memory Fence）
 
 
 
-#### <font color='blue'>\* 源码之 LongAdder</font>
+#### 源码之 LongAdder
 
 LongAdder 是并发大师 @author Doug Lea （大哥李）的作品，设计的非常精巧 
 
@@ -8013,7 +8156,7 @@ LongAdder 类有几个关键域
 transient volatile Cell[] cells;
 // 基础值, 如果没有竞争, 则用 cas 累加这个域
 transient volatile long base;
-// 在 cells 创建或扩容时, 置为 1, 表示加锁
+// 在 cells 创建或扩容时, 置为 1, 表示加锁（cas操作加锁解锁）
 transient volatile int cellsBusy;
 ```
 
@@ -8648,7 +8791,7 @@ class UnsafeAccessor{
 
 
 
-## **6.9 自定义cas锁**
+## 6.9 自定义cas锁
 
 ```java
 // 不要用于实践！！！
@@ -8715,7 +8858,7 @@ new Thread(() -> {
   - 字段更新器 
   - 原子累加器 
 - Unsafe 
-- <font color='blue'>*原理方面 </font>
+- 原理方面
   * LongAdder 源码 
   * 伪共享
 
@@ -8725,7 +8868,7 @@ new Thread(() -> {
 
 
 
-## 7.1 日期转换的问题 
+## 7.1 日期转换的问题
 
 
 
